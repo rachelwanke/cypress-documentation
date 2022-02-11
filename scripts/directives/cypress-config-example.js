@@ -13,11 +13,11 @@ function processNode(node, { _require, error, warn }) {
   const helpers = _require(__dirname, './helpers/example-helpers')
   const { attributes, children } = helpers.getNodeProperties(node)
   const { errorArgs, header, body } = helpers.getHeaderAndBody(children)
-
+    
   if (errorArgs) {
     return error(...errorArgs)
   }
-
+  
   const showConfigJson = !header && !attributes.noJson
   let configObj
 
@@ -39,6 +39,19 @@ function processNode(node, { _require, error, warn }) {
     }
   }
 
+  const isBaseUrl = 'isBaseUrl' in attributes
+  let testTypeObjWithProp = isBaseUrl ?
+      endent`
+        // baseUrl must be defined in the
+        // e2e test type configuration
+        e2e: ${body}
+      ` :
+      endent`
+        // can be defined in either
+        // the e2e or component configuration
+        e2e: ${body}
+      `
+
   return helpers.getCodeGroup(
     {
       label: 'cypress.config.js',
@@ -46,7 +59,9 @@ function processNode(node, { _require, error, warn }) {
       body: endent`
         const { defineConfig } = require('cypress')
         ${header}
-        module.exports = defineConfig(${body})
+        module.exports = defineConfig({
+          ${testTypeObjWithProp}
+        })
       `,
     },
     {
@@ -55,7 +70,9 @@ function processNode(node, { _require, error, warn }) {
       body: endent`
         import { defineConfig } from 'cypress'
         ${header}
-        export default defineConfig(${body})
+        export default defineConfig({
+          ${testTypeObjWithProp}
+        })
       `,
     },
     {
