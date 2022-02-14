@@ -47,8 +47,8 @@ function processNode(node, { _require, error, warn }) {
         e2e: ${body}
       ` :
       endent`
-        // can be defined in either
-        // the e2e or component configuration
+        // properties can be defined in either
+        // the e2e or component test type configuration
         e2e: ${body}
       `
 
